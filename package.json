@@ -5,7 +5,8 @@
   "license": "MIT",
   "scripts": {
     "compile": "buidler --show-stack-traces --max-memory 8192 compile",
-    "test": "buidler test"
+    "test": "buidler test",
+    "clean": "rm -rf artifacts cache"
   },
   "devDependencies": {
     "@nomiclabs/buidler": "^1.4.3",
