@@ -25,9 +25,4 @@ interface TokenSwapInterface {
   /// @param token The token whose balance we want.  Must be one of the swap pair.
   /// @return The underlying balance of the given token for the users shares.
   function balanceOfUnderlying(address user, address token) external view returns (uint256);
-
-  /// @notice Returns the underlying amount of a token that a user holds
-  /// @param user The user whose balance we want
-  /// @return The number of shares in the liquidity the user holds
-  function balanceOf(address user) external view returns (uint256);
 }

@@ -19,9 +19,9 @@ describe('TokenSwap', () => {
     [signer1, signer2, signer3] = await ethers.getSigners()
     tokenA = await deployContract(signer1, ERC20Mintable, ["Token A", "TOKA"])
     tokenB = await deployContract(signer1, ERC20Mintable, ["Token B", "TOKB"])
-    swap = await deployContract(signer1, TokenSwap, [])
-    swap2 = await swap.connect(signer2)
-    swap3 = await swap.connect(signer3)
+    swap = await deployContract(signer1, TokenSwap, [
+      "Swap Token A and B", "SWAB", tokenA.address, tokenB.address
+    ])
   })
 
   describe('supply()', () => {
@@ -43,17 +43,17 @@ describe('TokenSwap', () => {
       // Do a swap
       const swapAmount = toWei('100')
       await tokenB.mint(signer2._address, swapAmount)
-      await tokenB.approve(swap.address, swapAmount)
-      await swap2.swap(tokenB.address, swapAmount)
+      await tokenB.connect(signer2).approve(swap.address, swapAmount)
+      await swap.connect(signer2).swap(tokenB.address, swapAmount)
 
       // Pool now contains:
       //  - 905 Token A
       //  - 100 Token B
 
       const suppliedAmount2 = toWei('1005')
-      await tokenA.mint(signer1._address, suppliedAmount2)
-      await tokenA.approve(swap.address, suppliedAmount2)
-      await swap.supply(tokenA.address, suppliedAmount2)
+      await tokenA.mint(signer3._address, suppliedAmount2)
+      await tokenA.connect(signer3).approve(swap.address, suppliedAmount2)
+      await swap.connect(signer3).supply(tokenA.address, suppliedAmount2)
 
       // Pool Now contains:
       //  - 1910 Token A
@@ -75,8 +75,8 @@ describe('TokenSwap', () => {
 
       const swapAmount = toWei('100')
       await tokenB.mint(signer2._address, swapAmount)
-      await tokenB.approve(swap.address, swapAmount)
-      await swap2.swap(tokenB.address, swapAmount)
+      await tokenB.connect(signer2).approve(swap.address, swapAmount)
+      await swap.connect(signer2).swap(tokenB.address, swapAmount)
 
       expect(await tokenB.balanceOf(signer2._address)).to.equal('0')
       // less 5% fee
@@ -106,15 +106,15 @@ describe('TokenSwap', () => {
       // Do a swap
       const swapAmount = toWei('100')
       await tokenB.mint(signer2._address, swapAmount)
-      await tokenB.approve(swap.address, swapAmount)
-      await swap2.swap(tokenB.address, swapAmount)
+      await tokenB.connect(signer2).approve(swap.address, swapAmount)
+      await swap.connect(signer2).swap(tokenB.address, swapAmount)
 
       const shares = await swap.balanceOf(signer1._address)
       await swap.redeem(shares)
 
       expect(await tokenB.balanceOf(signer1._address)).to.equal(toWei('100'))
       // 5% fee
-      expect(await tokenA.balanceOf(signer1._address)).to.equal(toWei('5'))
+      expect(await tokenA.balanceOf(signer1._address)).to.equal(toWei('905'))
     })
   })
 
